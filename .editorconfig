@@ -1,0 +1,2 @@
+[*.{pm,pl,t}]
+indent_style = tab
