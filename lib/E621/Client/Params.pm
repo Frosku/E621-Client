@@ -25,10 +25,26 @@ fun merge_rules_and_args(:$rules, :$args) {
 	return \@merged;
 }
 
+fun generate_content(:$rules) {
+	my %content;
+
+	for my $param (@{collate_params(rules => $rules)}) {
+		$content{$_->{key}} = $_->{value};
+	}
+
+	return \%content;
+}
+
 fun generate_query(:$rules) {
 	my @query_string_components = map {
 		sprintf('%s=%s', $_->{key}, $_->{value});
-	} sort {
+	} @{collate_params(rules => $rules)};
+
+	return \@query_string_components;
+}
+
+fun collate_params(:$rules) {
+	my @params = sort {
 		$a->{key} cmp $b->{key};
 	} map {
 		my $qsc = clone $_;
@@ -42,7 +58,7 @@ fun generate_query(:$rules) {
 		$_->{is_query};
 	} @{$rules};
 
-	return \@query_string_components;
+	return \@params;
 }
 
 fun validate_required_params(:$rules) {
